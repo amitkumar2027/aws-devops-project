@@ -5,31 +5,24 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo "Cloning Repository..."
                 checkout scm
             }
         }
 
-        stage('List Files') {
+        stage('Verify Files') {
             steps {
                 sh '''
-                echo "Current Directory:"
-                pwd
-
-                echo "Project Files:"
                 ls -la
                 '''
             }
         }
 
-        stage('Verify Website Files') {
+        stage('Deploy') {
             steps {
                 sh '''
-                test -f index.html
-                test -f style.css
-                test -f script.js
-
-                echo "All required files found."
+                cp index.html /var/www/html/
+                cp style.css /var/www/html/
+                cp script.js /var/www/html/
                 '''
             }
         }
@@ -37,14 +30,8 @@ pipeline {
     }
 
     post {
-
         success {
-            echo "Pipeline Executed Successfully."
+            echo 'Deployment Successful!'
         }
-
-        failure {
-            echo "Pipeline Failed."
-        }
-
     }
 }
