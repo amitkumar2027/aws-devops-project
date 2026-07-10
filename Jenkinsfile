@@ -60,21 +60,6 @@ pipeline {
             }
         }
 
-        stage('Backup to S3') {
-            steps {
-                sh '''
-                    echo "Uploading project backup to S3..."
-
-                    aws s3 sync . s3://$S3_BUCKET \
-                        --exclude ".git/*" \
-                        --exclude ".gitignore"
-
-                    echo "S3 Backup completed successfully."
-                '''
-            }
-        }
-    }
-
     post {
         success {
             echo '==========================================='
