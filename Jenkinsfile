@@ -3,34 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('List Files') {
-            steps {
-                sh '''
-                pwd
-                ls -la
-                '''
-            }
-        }
-
-        stage('Verify') {
-            steps {
-                sh '''
-                test -f index.html
-                test -f style.css
-                test -f script.js
-
-                echo "Website verified."
-                '''pipeline {
-    agent any
-
-    stages {
-
         stage('Checkout Source') {
             steps {
                 echo 'Checking out source code...'
@@ -41,17 +13,17 @@ pipeline {
         stage('Verify Project Files') {
             steps {
                 sh '''
-                echo "Current Directory:"
-                pwd
+                    echo "Current Directory:"
+                    pwd
 
-                echo "Project Files:"
-                ls -la
+                    echo "Project Files:"
+                    ls -la
 
-                test -f index.html
-                test -f style.css
-                test -f script.js
+                    test -f index.html
+                    test -f style.css
+                    test -f script.js
 
-                echo "All website files found."
+                    echo "All website files found."
                 '''
             }
         }
@@ -59,13 +31,13 @@ pipeline {
         stage('Deploy to Nginx') {
             steps {
                 sh '''
-                echo "Deploying website..."
+                    echo "Deploying website..."
 
-                cp index.html /var/www/html/
-                cp style.css /var/www/html/
-                cp script.js /var/www/html/
+                    cp index.html /var/www/html/
+                    cp style.css /var/www/html/
+                    cp script.js /var/www/html/
 
-                echo "Deployment Successful!"
+                    echo "Deployment Successful!"
                 '''
             }
         }
@@ -73,48 +45,31 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh '''
-                echo "Checking deployed files..."
+                    echo "Checking deployed files..."
 
-                ls -la /var/www/html/
+                    ls -la /var/www/html/
 
-                test -f /var/www/html/index.html
-                test -f /var/www/html/style.css
-                test -f /var/www/html/script.js
+                    test -f /var/www/html/index.html
+                    test -f /var/www/html/style.css
+                    test -f /var/www/html/script.js
 
-                echo "Deployment Verified Successfully!"
+                    echo "Deployment Verified Successfully!"
                 '''
             }
         }
-
     }
 
     post {
-
         success {
-            echo '''
-========================================
-      BUILD SUCCESSFUL
-========================================
-Website deployed successfully.
-'''
+            echo 'BUILD SUCCESSFUL'
         }
 
         failure {
-            echo '''
-========================================
-      BUILD FAILED
-========================================
-Please check console output.
-'''
+            echo 'BUILD FAILED'
         }
 
         always {
-            echo "Pipeline Finished."
+            echo 'Pipeline Finished'
         }
-    }
-}
-            }
-        }
-
     }
 }
