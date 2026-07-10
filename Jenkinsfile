@@ -9,29 +9,26 @@ pipeline {
             }
         }
 
-        stage('Verify Files') {
+        stage('List Files') {
             steps {
                 sh '''
+                pwd
                 ls -la
                 '''
             }
         }
 
-        stage('Deploy') {
+        stage('Verify') {
             steps {
                 sh '''
-                cp index.html /var/www/html/
-                cp style.css /var/www/html/
-                cp script.js /var/www/html/
+                test -f index.html
+                test -f style.css
+                test -f script.js
+
+                echo "Website verified."
                 '''
             }
         }
 
-    }
-
-    post {
-        success {
-            echo 'Deployment Successful!'
-        }
     }
 }
