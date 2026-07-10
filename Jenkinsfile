@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        S3_BUCKET = 'amit-aws-devops-backup'
+    }
+
     stages {
 
         stage('Checkout Source') {
@@ -13,17 +17,17 @@ pipeline {
         stage('Verify Project Files') {
             steps {
                 sh '''
-                    echo "Current Directory:"
+                    echo "Current Working Directory:"
                     pwd
 
-                    echo "Project Files:"
+                    echo "Listing Project Files:"
                     ls -la
 
                     test -f index.html
                     test -f style.css
                     test -f script.js
 
-                    echo "All website files found."
+                    echo "All required files are present."
                 '''
             }
         }
@@ -31,13 +35,13 @@ pipeline {
         stage('Deploy to Nginx') {
             steps {
                 sh '''
-                    echo "Deploying website..."
+                    echo "Deploying website to Nginx..."
 
-                    cp index.html /var/www/html/
-                    cp style.css /var/www/html/
-                    cp script.js /var/www/html/
+                    sudo cp index.html /var/www/html/
+                    sudo cp style.css /var/www/html/
+                    sudo cp script.js /var/www/html/
 
-                    echo "Deployment Successful!"
+                    echo "Website deployed successfully."
                 '''
             }
         }
@@ -45,15 +49,27 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh '''
-                    echo "Checking deployed files..."
-
-                    ls -la /var/www/html/
+                    echo "Verifying deployment..."
 
                     test -f /var/www/html/index.html
                     test -f /var/www/html/style.css
                     test -f /var/www/html/script.js
 
-                    echo "Deployment Verified Successfully!"
+                    echo "Deployment verification successful."
+                '''
+            }
+        }
+
+        stage('Backup to S3') {
+            steps {
+                sh '''
+                    echo "Uploading project backup to S3..."
+
+                    aws s3 sync . s3://$S3_BUCKET \
+                        --exclude ".git/*" \
+                        --exclude ".gitignore"
+
+                    echo "S3 Backup completed successfully."
                 '''
             }
         }
@@ -61,15 +77,21 @@ pipeline {
 
     post {
         success {
+            echo '==========================================='
             echo 'BUILD SUCCESSFUL'
+            echo 'Website deployed and backed up to S3.'
+            echo '==========================================='
         }
 
         failure {
+            echo '==========================================='
             echo 'BUILD FAILED'
+            echo 'Check Console Output for errors.'
+            echo '==========================================='
         }
 
         always {
-            echo 'Pipeline Finished'
+            echo 'Pipeline execution completed.'
         }
     }
 }
