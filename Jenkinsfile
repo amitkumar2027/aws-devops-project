@@ -37,9 +37,9 @@ pipeline {
                 sh '''
                     echo "Deploying website to Nginx..."
 
-                    sudo cp index.html /var/www/html/
-                    sudo cp style.css /var/www/html/
-                    sudo cp script.js /var/www/html/
+                    cp index.html /var/www/html/
+                    cp style.css /var/www/html/
+                    cp script.js /var/www/html/
 
                     echo "Website deployed successfully."
                 '''
